@@ -1,0 +1,61 @@
+version: 2.1
+jobs:
+  setup_workspace:
+    docker:
+      - image: maven:3-amazoncorretto-21
+    steps:
+      - checkout
+      - run:
+          name: "Set up workspace"
+          command: |
+            echo "Setting up workspace..."
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  build_and_test:
+    docker:
+      - image: maven:3-amazoncorretto-21
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Build and Test"
+          command: |
+            mvn clean install
+  format_code:
+    docker:
+      - image: maven:3-amazoncorretto-21
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Format code with Spotless"
+          command: mvn spotless:apply
+
+  check_style:
+    docker:
+      - image: maven:3-amazoncorretto-21
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Check code style with Spotless"
+          command: mvn spotless:check
+
+
+workflows:
+  ci-workflow:
+    jobs:
+      - setup_workspace
+      - build_and_test:
+          requires:
+            - setup_workspace
+      - format_code:
+          requires:
+            - build_and_test
+      - check_style:
+          requires:
+            - format_code
+
+

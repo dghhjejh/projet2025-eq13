@@ -1,0 +1,31 @@
+package ca.ulaval.glo4002.application.domain.actions;
+
+import ca.ulaval.glo4002.application.domain.actions.enums.ActionName;
+import ca.ulaval.glo4002.application.domain.campus.id.BuildingId;
+import ca.ulaval.glo4002.application.domain.campus.id.ZoneId;
+import java.util.Objects;
+
+public record ActivateFireAlarm(BuildingId buildingId, ZoneId zoneId,
+    boolean shouldActivate) implements Action {
+  private static final ActionName ACTION_NAME = ActionName.ActivateFireAlarm;
+
+  @Override
+  public ActionName getName(){
+    return ACTION_NAME;
+  }
+
+  @Override
+  public boolean equals(Object o){
+    if (this == o)
+      return true;
+    if (!(o instanceof ActivateFireAlarm that))
+      return false;
+    return this.shouldActivate == that.shouldActivate && this.buildingId.equals(that.buildingId)
+        && this.zoneId.equals(that.zoneId);
+  }
+
+  @Override
+  public int hashCode(){
+    return Objects.hash(this.shouldActivate,this.buildingId,this.zoneId);
+  }
+}
